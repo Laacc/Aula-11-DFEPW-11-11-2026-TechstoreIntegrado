@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>TechStore - Cadastro</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Conteúdo aqui -->
+        <div class="container">
+            <h1>Cadastro TechStore</h1>
+            <p class="subtitulo">Cadastre-se para ofertas</p>
+                <form id="formCadastro">
+                    <div class="campo">
+                        <label for="nome">Nome Completo *</labe>
+                        <input type="text" id="nome" name="nome" placeholder="Ex: Maria da Silva" required>
+                    </div>
+                    <div class="campo">
+                        <label for="email">E-mail *</label>
+                        <input type="email" id="email" name="email" placeholder="Ex: maria@email.com" required>
+                    </div>
+                    <div class="campo">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" name="telefone" placeholder="Ex: (11) 99999-9999">
+                    </div>
+        <button type="submit">Cadastrar</button>
+        </form>
+
+        <div id="mensagem"></div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+            const SUPABASE_URL = "https://euwmmjeftaridlxqrjza.supabase.co/rest/v1/";
+            const SUPABASE_ANON_KEY = "sb_publishable_KvF_DDfbZBpX-dixj8AoPg_2BCok4k5";
+            const supabase = window.supabase
+            .createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        </script>
+        <script src="script.js" defer></script>
+    </body>
+</html>
