@@ -1,161 +1,66 @@
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║                                                                  ║
-║   TECHSTORE CADASTRO — Formulário Full-Stack                     ║
-║   Desenvolvimento Front-End para Web                             ║
-║   Aula: Formulário de Cadastro com Supabase + GitHub + Vercel    ║
-║                                                                  ║
-║   Universidade Cruzeiro do Sul — Ciência da Computação           ║
-║   Prof. Marcos Venícios — 2026/2                                 ║
-║                                                                  ║
-║   Este arquivo contém o código COMPLETO do formulário             ║
-║   de cadastro da TechStore com integração ao Supabase.           ║
-║   Cada seção corresponde a um bloco da aula.                     ║
-║                                                                  ║
-║   COMO USAR:                                                     ║
-║   1. Crie um projeto no Supabase (supabase.com)                  ║
-║   2. Crie a tabela "cadastros" conforme instruções do guia       ║
-║   3. Substitua SUPABASE_URL e SUPABASE_ANON_KEY abaixo           ║
-║   4. Salve como "index.html"                                     ║
-║   5. Abra no navegador para testar localmente                    ║
-║   6. Faça deploy via GitHub + Vercel                             ║
-║                                                                  ║
-║   DEPENDÊNCIAS:                                                  ║
-║   - Supabase JS Client v2 (via CDN)                              ║
-║   - Nenhuma instalação local necessária                          ║
-║   - Precisa de internet (CDN + API do Supabase)                  ║
-║                                                                  ║
-║   SQL PARA CRIAR A TABELA NO SUPABASE:                           ║
-║                                                                  ║
-║   CREATE TABLE cadastros (                                        ║
-║     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,           ║
-║     nome TEXT NOT NULL,                                           ║
-║     email TEXT NOT NULL,                                          ║
-║     telefone TEXT,                                                ║
-║     created_at TIMESTAMPTZ DEFAULT NOW()                          ║
-║   );                                                             ║
-║                                                                  ║
-║   -- Permitir inserção anônima (necessário para o formulário):   ║
-║   ALTER TABLE cadastros ENABLE ROW LEVEL SECURITY;                ║
-║   CREATE POLICY "Permitir inserção anônima"                      ║
-║     ON cadastros FOR INSERT                                      ║
-║     TO anon                                                      ║
-║     WITH CHECK (true);                                           ║
-║                                                                  ║
-║   -- Permitir leitura anônima (para verificar os dados):         ║
-║   CREATE POLICY "Permitir leitura anônima"                       ║
-║     ON cadastros FOR SELECT                                      ║
-║     TO anon                                                      ║
-║     USING (true);                                                ║
-║                                                                  ║
-╚══════════════════════════════════════════════════════════════════╝
--->
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-<!--
-  lang="pt-BR" → Idioma da página: Português do Brasil.
-  Importante para acessibilidade e SEO.
--->
-
 <head>
-    <!-- ════════════════════════════════════════════════════════════
-         BLOCO 1 — CABEÇALHO (HEAD)
-         Metadados, fontes e estilos do formulário
-         ════════════════════════════════════════════════════════════ -->
-
     <meta charset="UTF-8">
-    <!-- UTF-8 → Garante que acentos (ã, é, ç) apareçam corretamente -->
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Viewport → ESSENCIAL para responsividade em dispositivos móveis -->
-
     <title>TechStore — Cadastro</title>
 
-    <!-- Google Fonts — Fonte Inter para visual moderno e limpo
-         A fonte é carregada do servidor do Google (CDN).
-         "Inter" é uma fonte sans-serif projetada para telas. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-
-    <!-- ════════════════════════════════════════════════════════════
-         BLOCO 2 — CSS (Estilos)
-         Todas as regras visuais do formulário
-         ════════════════════════════════════════════════════════════ -->
     <style>
-        /* ╔══════════════════════════════════════════════════╗
-           ║  VARIÁVEIS CSS (Custom Properties)              ║
-           ║  Definimos as cores em UM LUGAR CENTRAL.        ║
-           ║  Para mudar o visual inteiro, basta alterar     ║
-           ║  os valores aqui — o resto se adapta sozinho.   ║
-           ╚══════════════════════════════════════════════════╝ */
         :root {
-            --cor-primaria: #1B3A5C;      /* Azul escuro — cor principal */
-            --cor-secundaria: #E07B2A;    /* Laranja — destaque/ação */
-            --cor-fundo: #F5F0E8;         /* Creme — fundo da página */
-            --cor-branco: #FFFFFF;         /* Branco — fundo do card */
-            --cor-texto: #212121;          /* Quase-preto — texto principal */
-            --cor-texto-claro: #8B9DAF;   /* Cinza azulado — texto secundário */
-            --cor-sucesso: #27AE60;        /* Verde — mensagem de sucesso */
-            --cor-erro: #E74C3C;           /* Vermelho — mensagem de erro */
-            --cor-borda: #D1C7B7;          /* Bege — bordas dos inputs */
-            --sombra: 0 10px 40px rgba(27, 58, 92, 0.12);
-            --raio-borda: 12px;            /* Cantos arredondados */
+            --cor-primaria: #1B3A5C;
+            --cor-secundaria: #E07B2A;
+            --cor-fundo: #F5F0E8;
+            --cor-branco: #FFFFFF;
+            --cor-texto: #212121;
+            --cor-texto-claro: #8B9DAF;
+            --cor-sucesso: #27AE60;
+            --cor-erro: #E74C3C;
+            --cor-borda: #D1C7B7;
+            --sombra: 0 10px 40px rgba(27,58,92,0.12);
+            --raio-borda: 12px;
         }
 
-        /* ── RESET BÁSICO ──
-           Remove margens e paddings padrão do navegador.
-           box-sizing: border-box → padding e border são
-           incluídos no tamanho total do elemento. */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* ── CORPO DA PÁGINA ── */
         body {
-            font-family: 'Inter', sans-serif;  /* Fonte carregada do Google */
+            font-family: 'Inter', sans-serif;
             background-color: var(--cor-fundo);
             color: var(--cor-texto);
-            min-height: 100vh;                  /* Altura mínima = tela inteira */
-
-            /* Flexbox para centralizar o card na tela
-               display: flex → ativa o flexbox
-               justify-content: center → centraliza horizontalmente
-               align-items: center → centraliza verticalmente */
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
-        /* ── CONTAINER PRINCIPAL (Card) ──
-           O formulário inteiro fica dentro deste card branco. */
         .container {
             background: var(--cor-branco);
             border-radius: var(--raio-borda);
             box-shadow: var(--sombra);
             padding: 40px;
             width: 100%;
-            max-width: 500px;            /* Largura máxima — não estica demais */
+            max-width: 500px;
         }
 
-        /* ── CABEÇALHO DO FORMULÁRIO ── */
         .form-header {
             text-align: center;
             margin-bottom: 32px;
         }
 
-        /* Ícone/emoji do logo */
-        .form-header .logo {
+        .logo {
             font-size: 48px;
             margin-bottom: 8px;
         }
 
-        /* Título principal */
         .form-header h1 {
             font-size: 24px;
             font-weight: 700;
@@ -163,102 +68,77 @@
             margin-bottom: 8px;
         }
 
-        /* Subtítulo */
         .form-header p {
             font-size: 14px;
             color: var(--cor-texto-claro);
         }
 
-        /* ── GRUPO DE CAMPO (Label + Input) ──
-           Cada campo do formulário fica em um grupo. */
         .campo-grupo {
             margin-bottom: 20px;
         }
 
-        /* Label — rótulo do campo */
         .campo-grupo label {
-            display: block;              /* Ocupa linha inteira */
+            display: block;
             font-size: 14px;
             font-weight: 600;
             color: var(--cor-primaria);
             margin-bottom: 6px;
         }
 
-        /* Asterisco vermelho para campos obrigatórios */
-        .campo-grupo label .obrigatorio {
+        .obrigatorio {
             color: var(--cor-erro);
-            margin-left: 2px;
         }
 
-        /* ── INPUTS (Campos de texto, email, telefone) ──
-           Todos os inputs compartilham o mesmo estilo base. */
         .campo-grupo input {
-            width: 100%;                 /* Largura total do container */
+            width: 100%;
             padding: 12px 16px;
             font-size: 16px;
-            font-family: 'Inter', sans-serif;
+            font-family: inherit;
             border: 2px solid var(--cor-borda);
             border-radius: 8px;
             background: var(--cor-fundo);
             color: var(--cor-texto);
-            transition: all 0.3s ease;   /* Animação suave nas mudanças */
-            outline: none;               /* Remove o contorno padrão do navegador */
+            transition: all 0.3s ease;
+            outline: none;
         }
 
-        /* ── ESTADO FOCUS ──
-           Quando o usuário CLICA no campo (campo ativo).
-           A borda muda de cor e aparece um "brilho" azul ao redor. */
         .campo-grupo input:focus {
             border-color: var(--cor-primaria);
             background: var(--cor-branco);
-            box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.15);
+            box-shadow: 0 0 0 3px rgba(27,58,92,0.15);
         }
 
-        /* ── PLACEHOLDER ──
-           Texto fantasma que aparece quando o campo está vazio.
-           Dica visual para o usuário saber o que digitar. */
         .campo-grupo input::placeholder {
             color: var(--cor-texto-claro);
             font-size: 14px;
         }
 
-        /* ── BOTÃO DE ENVIO ── */
         .btn-enviar {
             width: 100%;
             padding: 14px;
             font-size: 16px;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            font-family: inherit;
             color: var(--cor-branco);
-            background-color: var(--cor-secundaria);  /* Laranja */
+            background-color: var(--cor-secundaria);
             border: none;
             border-radius: 8px;
-            cursor: pointer;             /* Mãozinha ao passar o mouse */
+            cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 8px;
         }
 
-        /* Hover — quando o mouse passa sobre o botão */
-        .btn-enviar:hover {
-            background-color: #C96A1F;   /* Laranja mais escuro */
-            transform: translateY(-2px); /* Sobe 2px — efeito de "flutuar" */
-            box-shadow: 0 4px 12px rgba(224, 123, 42, 0.4);
+        .btn-enviar:hover:not(:disabled) {
+            background-color: #C96A1F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(224,123,42,0.4);
         }
 
-        /* Active — quando o botão é pressionado */
-        .btn-enviar:active {
-            transform: translateY(0);    /* Volta à posição original */
-        }
-
-        /* Disabled — quando o formulário está enviando */
         .btn-enviar:disabled {
             background-color: var(--cor-texto-claro);
             cursor: not-allowed;
-            transform: none;
         }
 
-        /* ── MENSAGEM DE FEEDBACK ──
-           Aparece após o envio: sucesso (verde) ou erro (vermelho). */
         .mensagem {
             text-align: center;
             padding: 12px;
@@ -266,10 +146,9 @@
             font-size: 14px;
             font-weight: 500;
             margin-top: 16px;
-            display: none;               /* Escondida por padrão */
+            display: none;
         }
 
-        /* Variação: sucesso */
         .mensagem.sucesso {
             display: block;
             background-color: #E8F5E9;
@@ -277,7 +156,6 @@
             border: 1px solid var(--cor-sucesso);
         }
 
-        /* Variação: erro */
         .mensagem.erro {
             display: block;
             background-color: #FFEBEE;
@@ -285,7 +163,6 @@
             border: 1px solid var(--cor-erro);
         }
 
-        /* ── RODAPÉ ── */
         .rodape {
             text-align: center;
             margin-top: 24px;
@@ -293,8 +170,6 @@
             color: var(--cor-texto-claro);
         }
 
-        /* ── RESPONSIVIDADE ──
-           Em telas muito pequenas (< 480px), reduz o padding. */
         @media (max-width: 480px) {
             .container {
                 padding: 24px;
@@ -309,366 +184,175 @@
 
 <body>
 
-    <!-- ════════════════════════════════════════════════════════════
-         BLOCO 3 — HTML (Estrutura do Formulário)
+<div class="container">
 
-         Elementos utilizados:
-         • <form>     → Container do formulário (agrupa todos os campos)
-         • <label>    → Rótulo associado a um input (acessibilidade)
-         • <input>    → Campo de entrada de dados
-         • <button>   → Botão de ação (enviar)
-         • <span>     → Elemento inline para estilização (asterisco)
-
-         Atributos importantes dos inputs:
-         • type="text"   → Texto livre
-         • type="email"  → Valida formato de email automaticamente
-         • type="tel"    → Teclado numérico em celulares
-         • required      → Campo obrigatório (não envia se vazio)
-         • placeholder   → Texto-dica quando o campo está vazio
-         • id            → Identificador único (usado pelo JS e pelo label)
-         • name          → Nome do campo (usado no envio dos dados)
-
-         Conexão label ↔ input:
-         O atributo "for" do <label> deve ser IGUAL ao "id" do <input>.
-         Isso permite clicar no label para focar no input (acessibilidade).
-         ════════════════════════════════════════════════════════════ -->
-
-    <div class="container">
-
-        <!-- Cabeçalho visual do formulário -->
-        <div class="form-header">
-            <div class="logo">🛒</div>
-            <h1>TechStore Cadastro</h1>
-            <p>Cadastre-se e receba ofertas exclusivas de tecnologia!</p>
-        </div>
-
-        <!-- O FORMULÁRIO
-             id="formCadastro" → Usado pelo JavaScript para capturar o evento
-             O formulário NÃO tem "action" nem "method" porque
-             o envio é feito via JavaScript (não via HTTP tradicional). -->
-        <form id="formCadastro">
-
-            <!-- Campo: Nome Completo -->
-            <div class="campo-grupo">
-                <label for="nome">
-                    Nome Completo
-                    <span class="obrigatorio">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="nome"
-                    name="nome"
-                    placeholder="Ex: Maria da Silva"
-                    required
-                >
-                <!-- required → O navegador impede o envio se este campo estiver vazio -->
-            </div>
-
-            <!-- Campo: E-mail -->
-            <div class="campo-grupo">
-                <label for="email">
-                    E-mail
-                    <span class="obrigatorio">*</span>
-                </label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Ex: maria@email.com"
-                    required
-                >
-                <!-- type="email" → O navegador valida se tem @ e domínio -->
-            </div>
-
-            <!-- Campo: Telefone -->
-            <div class="campo-grupo">
-                <label for="telefone">
-                    Telefone
-                </label>
-                <input
-                    type="tel"
-                    id="telefone"
-                    name="telefone"
-                    placeholder="Ex: (11) 99999-9999"
-                >
-                <!-- type="tel" → Em celulares, abre teclado numérico
-                     Não é obrigatório (sem "required") -->
-            </div>
-
-            <!-- Botão de Envio -->
-            <button type="submit" class="btn-enviar" id="btnEnviar">
-                Cadastrar
-            </button>
-
-            <!-- Área de mensagem (sucesso ou erro) — começa escondida -->
-            <div id="mensagem" class="mensagem"></div>
-
-        </form>
-
-        <!-- Rodapé -->
-        <div class="rodape">
-            🛒 TechStore &copy; 2026 — Aula de Front-End Web
-        </div>
-
+    <div class="form-header">
+        <div class="logo">🛒</div>
+        <h1>TechStore Cadastro</h1>
+        <p>Cadastre-se e receba ofertas exclusivas de tecnologia!</p>
     </div>
 
+    <form id="formCadastro">
 
-    <!-- ════════════════════════════════════════════════════════════
-         BLOCO 4 — JAVASCRIPT (Lógica e Integração com Supabase)
+        <div class="campo-grupo">
+            <label for="nome">
+                Nome Completo <span class="obrigatorio">*</span>
+            </label>
+            <input
+                type="text"
+                id="nome"
+                name="nome"
+                placeholder="Ex: Maria da Silva"
+                required
+            >
+        </div>
 
-         Este bloco faz TRÊS coisas:
-         1. Conecta ao banco de dados Supabase
-         2. Captura os dados do formulário quando o usuário clica "Cadastrar"
-         3. Envia os dados para a tabela "cadastros" no Supabase
+        <div class="campo-grupo">
+            <label for="email">
+                E-mail <span class="obrigatorio">*</span>
+            </label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Ex: maria@email.com"
+                required
+            >
+        </div>
 
-         FLUXO DO ENVIO:
-         ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-         │  Usuário      │───→│  JavaScript   │───→│  Supabase    │
-         │  preenche e   │    │  captura e    │    │  grava no    │
-         │  clica enviar │    │  envia dados  │    │  PostgreSQL  │
-         └──────────────┘    └──────────────┘    └──────────────┘
-         ════════════════════════════════════════════════════════════ -->
+        <div class="campo-grupo">
+            <label for="telefone">Telefone</label>
+            <input
+                type="tel"
+                id="telefone"
+                name="telefone"
+                placeholder="Ex: (11) 99999-9999"
+            >
+        </div>
 
-    <!-- Supabase JS Client via CDN
-         Este script carrega a biblioteca oficial do Supabase.
-         Ela cria o objeto "supabase" que permite:
-         - .from('tabela') → selecionar uma tabela
-         - .insert([...])  → inserir dados
-         - .select()       → consultar dados
-         A versão @2 é a mais recente e estável. -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <button type="submit" class="btn-enviar" id="btnEnviar">
+            Cadastrar
+        </button>
 
-    <script>
-        // ╔══════════════════════════════════════════════════════════╗
-        // ║  CONFIGURAÇÃO DO SUPABASE                               ║
-        // ║                                                          ║
-        // ║  ⚠️  SUBSTITUA os valores abaixo pelas suas             ║
-        // ║     credenciais do projeto Supabase!                     ║
-        // ║                                                          ║
-        // ║  Onde encontrar:                                         ║
-        // ║  Supabase Dashboard → Settings → API                    ║
-        // ║  • Project URL → copie para SUPABASE_URL                ║
-        // ║  • anon public → copie para SUPABASE_ANON_KEY           ║
-        // ║                                                          ║
-        // ║  A "anon key" é uma chave PÚBLICA — pode ficar          ║
-        // ║  no código do front-end. A segurança é feita            ║
-        // ║  pelas Row Level Security (RLS) policies no Supabase.   ║
-        // ╚══════════════════════════════════════════════════════════╝
+        <div id="mensagem" class="mensagem" role="status"></div>
 
-        const SUPABASE_URL = 'https://euwmmjeftaridlxqrjza.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_KvF_DDfbZBpX-dixj8AoPg_2BCok4k5';
+    </form>
 
-        // Cria o "cliente" Supabase — o objeto que faz a comunicação
-        // com o banco de dados. É como abrir uma "conexão".
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <div class="rodape">
+        🛒 TechStore &copy; 2026 — Aula de Front-End Web
+    </div>
 
+</div>
 
-        // ── REFERÊNCIAS AOS ELEMENTOS HTML ──
-        // document.getElementById() → Busca um elemento pelo seu "id"
-        // Guardamos em variáveis para não buscar toda vez que precisar
-        const formulario = document.getElementById('formCadastro');
-        const btnEnviar = document.getElementById('btnEnviar');
-        const divMensagem = document.getElementById('mensagem');
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+    // CONFIGURAÇÃO DO SUPABASE
 
-        // ╔══════════════════════════════════════════════════════════╗
-        // ║  FUNÇÃO: mostrarMensagem                                ║
-        // ║  Exibe uma mensagem de sucesso ou erro para o usuário   ║
-        // ║                                                          ║
-        // ║  Parâmetros:                                             ║
-        // ║  • texto → O texto da mensagem                          ║
-        // ║  • tipo  → 'sucesso' ou 'erro' (muda a cor)            ║
-        // ╚══════════════════════════════════════════════════════════╝
-        function mostrarMensagem(texto, tipo) {
-            divMensagem.textContent = texto;
+    const SUPABASE_URL = 'https://euwmmjeftaridlxqrjza.supabase.co';
 
-            // Remove classes anteriores e adiciona a nova
-            divMensagem.className = 'mensagem ' + tipo;
-            // className substitui TODAS as classes do elemento
-            // Resultado: "mensagem sucesso" ou "mensagem erro"
+    const SUPABASE_ANON_KEY = 'sb_publishable_KvF_DDfbZBpX-dixj8AoPg_2BCok4k5';
 
-            // Após 5 segundos, esconde a mensagem automaticamente
-            setTimeout(function() {
-                divMensagem.className = 'mensagem';
-                // Volta para só "mensagem" (sem sucesso/erro)
-                // Como a classe "mensagem" tem display:none, ela desaparece
-            }, 5000);
+    // Verifica se a biblioteca carregou
+
+    if (!window.supabase) {
+        throw new Error('Supabase não carregou. Verifique sua conexão.');
+    }
+
+    // Inicializa o cliente
+
+    const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+    // ELEMENTOS HTML
+
+    const formulario = document.getElementById('formCadastro');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const divMensagem = document.getElementById('mensagem');
+
+    // FUNÇÃO DE MENSAGEM
+
+    function mostrarMensagem(texto, tipo) {
+        divMensagem.textContent = texto;
+        divMensagem.className = 'mensagem ' + tipo;
+    }
+
+    // ENVIO DO FORMULÁRIO
+
+    formulario.addEventListener('submit', async function(evento) {
+
+        evento.preventDefault();
+
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const telefone = document.getElementById('telefone').value.trim();
+
+        if (!nome || !email) {
+            mostrarMensagem(
+                'Por favor, preencha nome e e-mail.',
+                'erro'
+            );
+            return;
         }
 
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = 'Enviando...';
 
-        // ╔══════════════════════════════════════════════════════════╗
-        // ║  EVENTO: SUBMIT DO FORMULÁRIO                           ║
-        // ║                                                          ║
-        // ║  addEventListener('submit', ...) → Escuta o evento de   ║
-        // ║  envio do formulário. Dispara quando o usuário clica    ║
-        // ║  no botão "Cadastrar" ou pressiona Enter.               ║
-        // ║                                                          ║
-        // ║  "async" → Permite usar "await" dentro da função.       ║
-        // ║  "await" → Espera a operação terminar antes de          ║
-        // ║  continuar (o envio ao Supabase leva alguns segundos).  ║
-        // ╚══════════════════════════════════════════════════════════╝
-        formulario.addEventListener('submit', async function(evento) {
+        divMensagem.className = 'mensagem';
 
-            // preventDefault() → IMPEDE o comportamento padrão do formulário.
-            // Sem isso, o navegador recarregaria a página ao enviar.
-            // Queremos controlar o envio via JavaScript.
-            evento.preventDefault();
+        try {
 
+            // INSERE OS DADOS NO SUPABASE
 
-            // ── CAPTURA DOS DADOS ──
-            // .value → Pega o texto que o usuário digitou no campo
-            // .trim() → Remove espaços em branco do início e do fim
-            //           "  Maria  " → "Maria"
-            const nome = document.getElementById('nome').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const telefone = document.getElementById('telefone').value.trim();
+            const { error } = await supabase
+                .from('cadastros')
+                .insert({
+                    nome: nome,
+                    email: email,
+                    telefone: telefone || null
+                });
 
+            if (error) {
+                console.error('Erro do Supabase:', error);
 
-            // ── VALIDAÇÃO BÁSICA ──
-            // Verifica se nome e email foram preenchidos.
-            // O "required" do HTML já faz isso, mas é boa prática
-            // validar também no JavaScript (defesa em profundidade).
-            if (!nome || !email) {
-                mostrarMensagem('Por favor, preencha nome e e-mail.', 'erro');
-                return;  // Sai da função — não envia nada
+                mostrarMensagem(
+                    'Erro ao cadastrar: ' + error.message,
+                    'erro'
+                );
+
+            } else {
+
+                mostrarMensagem(
+                    '✅ Cadastro realizado com sucesso!',
+                    'sucesso'
+                );
+
+                formulario.reset();
             }
 
+        } catch (erro) {
 
-            // ── FEEDBACK VISUAL: ESTADO "ENVIANDO" ──
-            // Desabilita o botão e muda o texto enquanto envia.
-            // Evita que o usuário clique várias vezes (envio duplicado).
-            btnEnviar.disabled = true;
-            btnEnviar.textContent = 'Enviando...';
+            console.error('Erro inesperado:', erro);
 
+            mostrarMensagem(
+                'Erro de conexão. Verifique sua internet e tente novamente.',
+                'erro'
+            );
 
-            // ── ENVIO DOS DADOS AO SUPABASE ──
-            // try/catch → Tenta executar o código.
-            //              Se der erro, o "catch" captura e trata.
-            try {
+        } finally {
 
-                // supabase.from('cadastros') → Seleciona a tabela "cadastros"
-                // .insert([{...}])           → Insere um novo registro
-                // .select()                  → Retorna o registro inserido
-                //
-                // O objeto dentro do array são os dados a inserir.
-                // As CHAVES (nome, email, telefone) devem ser IGUAIS
-                // aos nomes das colunas na tabela do Supabase.
-                const { data, error } = await supabase
-                    .from('cadastros')
-                    .insert([
-                        {
-                            nome: nome,
-                            email: email,
-                            telefone: telefone
-                        }
-                    ])
-                    .select();
+            // RESTAURA O BOTÃO MESMO SE OCORRER UM ERRO
 
-                // ── VERIFICAÇÃO DO RESULTADO ──
-                // O Supabase retorna { data, error }.
-                // Se "error" existir, algo deu errado.
-                if (error) {
-                    console.error('Erro do Supabase:', error);
-                    mostrarMensagem('Erro ao cadastrar: ' + error.message, 'erro');
-                } else {
-                    // SUCESSO! O registro foi inserido no banco.
-                    console.log('Cadastro realizado:', data);
-                    mostrarMensagem('✅ Cadastro realizado com sucesso!', 'sucesso');
-
-                    // Limpa o formulário para um novo cadastro
-                    // .reset() → Volta todos os campos ao estado inicial
-                    formulario.reset();
-                }
-
-            } catch (erro) {
-                // Se ocorrer um erro inesperado (rede caiu, por exemplo)
-                console.error('Erro inesperado:', erro);
-                mostrarMensagem('Erro de conexão. Verifique sua internet.', 'erro');
-            }
-
-
-            // ── RESTAURA O BOTÃO ──
-            // Independente de sucesso ou erro, reabilita o botão.
             btnEnviar.disabled = false;
             btnEnviar.textContent = 'Cadastrar';
-        });
-    </script>
+        }
+
+    });
+
+</script>
 
 </body>
 </html>
-
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║                    RESUMO DE CONCEITOS                           ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                  ║
-║  HTML — FORMULÁRIOS:                                             ║
-║  <form> .............. Container do formulário                   ║
-║  <label for="id"> .... Rótulo acessível (clicável)              ║
-║  <input type="text"> . Campo de texto livre                     ║
-║  <input type="email">  Valida formato de email                  ║
-║  <input type="tel"> .. Teclado numérico em mobile               ║
-║  required ............ Campo obrigatório                         ║
-║  placeholder ......... Texto-dica dentro do campo               ║
-║  <button type="submit"> Botão de envio do formulário            ║
-║                                                                  ║
-║  CSS — CONCEITOS:                                                ║
-║  :root / var() ....... Variáveis CSS (cores centralizadas)      ║
-║  box-sizing .......... Modelo de caixa previsível               ║
-║  display: flex ....... Layout flexível                           ║
-║  transition .......... Animações suaves                          ║
-║  :focus .............. Estado quando o campo está ativo          ║
-║  :hover .............. Estado quando o mouse passa sobre         ║
-║  :active ............. Estado quando o botão é pressionado       ║
-║  ::placeholder ....... Estilo do texto-dica                     ║
-║  @media .............. Regra responsiva (adapta por tela)        ║
-║  border-radius ....... Cantos arredondados                       ║
-║  box-shadow .......... Sombra para profundidade visual           ║
-║                                                                  ║
-║  JAVASCRIPT — CONCEITOS:                                         ║
-║  getElementById() .... Busca elemento pelo id                   ║
-║  addEventListener() .. Escuta eventos (submit, click)           ║
-║  preventDefault() .... Impede comportamento padrão              ║
-║  .value .............. Pega o texto digitado no input            ║
-║  .trim() ............. Remove espaços do início/fim             ║
-║  async/await ......... Operações assíncronas (espera resposta)  ║
-║  try/catch ........... Tratamento de erros                      ║
-║  .reset() ............ Limpa todos os campos do form            ║
-║  setTimeout() ........ Executa algo após X milissegundos        ║
-║  console.log/error ... Depuração no console do navegador        ║
-║                                                                  ║
-║  SUPABASE — CONCEITOS:                                           ║
-║  createClient() ...... Cria conexão com o banco                 ║
-║  .from('tabela') ..... Seleciona uma tabela                     ║
-║  .insert([{...}]) .... Insere um registro                       ║
-║  .select() ........... Retorna os dados inseridos               ║
-║  Row Level Security .. Controle de acesso por linha             ║
-║  anon key ............ Chave pública para o front-end           ║
-║                                                                  ║
-║  DEPLOY — CONCEITOS:                                             ║
-║  Git ................. Sistema de controle de versão             ║
-║  GitHub .............. Plataforma para hospedar repositórios     ║
-║  Vercel .............. Plataforma de deploy automático           ║
-║  CDN ................. Rede de distribuição de conteúdo          ║
-║                                                                  ║
-║  ARQUITETURA:                                                    ║
-║  ┌──────────┐    ┌──────────┐    ┌──────────┐                   ║
-║  │ Navegador │───→│ Supabase │    │  Vercel  │                   ║
-║  │ (HTML/JS) │    │(PostgreSQL)   │ (hosting)│                   ║
-║  └──────────┘    └──────────┘    └──────────┘                   ║
-║       ↑                               ↑                          ║
-║       └───── GitHub (código-fonte) ───┘                          ║
-║                                                                  ║
-║  FLUXO DE DEPLOY:                                                ║
-║  Código local → git push → GitHub → Vercel detecta → Deploy     ║
-║                                                                  ║
-║  LINKS ÚTEIS:                                                    ║
-║  Supabase:  https://supabase.com                                 ║
-║  GitHub:    https://github.com                                   ║
-║  Vercel:    https://vercel.com                                   ║
-║  Inter Font: https://fonts.google.com/specimen/Inter             ║
-║  MDN Forms: https://developer.mozilla.org/pt-BR/docs/Web/HTML/  ║
-║             Element/form                                         ║
-║                                                                  ║
-╚══════════════════════════════════════════════════════════════════╝
--->
